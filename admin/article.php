@@ -32,8 +32,15 @@ if (isset($_GET['id'])) {
 }
 
 if (isset($_POST['saveArticle'])) {
-
-    //@todo Amélioration : gérer la gestion des erreurs sur les champs (champ vide etc.)
+    if (empty(trim($_POST['title'] ?? ''))) {
+        $errors[] = "Le titre est obligatoire";
+    }
+    if (empty(trim($_POST['content'] ?? ''))) {
+        $errors[] = "Le contenu est obligatoire";
+    }
+    if (empty($_POST['category_id'] ?? '')) {
+        $errors[] = "La catégorie est obligatoire";
+    }
     
     $fileName = null;
     // Si un fichier est envoyé
@@ -48,10 +55,10 @@ if (isset($_POST['saveArticle'])) {
             /* On déplace le fichier uploadé dans notre dossier upload, dirname(__DIR__) 
                 permet de cibler le dossier parent car on se trouve dans admin
             */
-            if (move_uploaded_file($_FILES["file"]["tmp_name"], dirname(__DIR__)._ARTICLES_IMAGES_FOLDER_ . $fileName)) {
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], _ARTICLES_IMAGES_FS_PATH_ . $fileName)) {
                 if (isset($_POST['image'])) {
                     // On supprime l'ancienne image si on a posté une nouvelle
-                    unlink(dirname(__DIR__)._ARTICLES_IMAGES_FOLDER_ . $_POST['image']);
+                    unlink(_ARTICLES_IMAGES_FS_PATH_ . $_POST['image']);
                 }
             } else {
                 $errors[] = 'Le fichier n\'a pas été uploadé';
@@ -64,7 +71,7 @@ if (isset($_POST['saveArticle'])) {
         if (isset($_GET['id'])) {
             if (isset($_POST['delete_image'])) {
                 // Si on a coché la case de suppression d'image, on supprime l'image
-                unlink(dirname(__DIR__)._ARTICLES_IMAGES_FOLDER_ . $_POST['image']);
+                unlink(_ARTICLES_IMAGES_FS_PATH_ . $_POST['image']);
             } else {
                 $fileName = $_POST['image'];
             }
@@ -134,7 +141,7 @@ if (isset($_POST['saveArticle'])) {
             <label for="category" class="form-label">Catégorie</label>
             <select name="category_id" id="category" class="form-select">
                 <?php foreach ($categories as $category) { ?>
-                    <option value="1" <?php if (isset($article['category_id']) && $article['category_id'] == $category['id']) { ?>selected="selected" <?php }; ?>><?= $category['name'] ?></option>
+                    <option value="<?= $category['id'] ?>" <?php if (isset($article['category_id']) && $article['category_id'] == $category['id']) { ?>selected="selected" <?php }; ?>><?= htmlentities($category['name']) ?></option>
                 <?php } ?>
             </select>
         </div>

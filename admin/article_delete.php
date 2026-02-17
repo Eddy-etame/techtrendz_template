@@ -15,8 +15,9 @@ if (isset($_GET["id"])) {
     $article =  getArticleById($pdo, $_GET["id"]);
 }
 if ($article) {
-    if (deleteArticle($pdo, $_GET["id"])) {
-        $messages[] = "L'article a bien été supprimé";
+    if (deleteArticle($pdo, (int)$_GET["id"])) {
+        header("Location: articles.php?delete=1");
+        exit();
     } else {
         $errors[] = "Une erreur s'est produite lors de la suppression";
     }

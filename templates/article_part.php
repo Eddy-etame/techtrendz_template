@@ -1,8 +1,8 @@
 <?php
-    if ($article["image"] === null) {
-        $imagePath = _ASSETS_IMAGES_FOLDER_."default-article.jpg";
+    if ($article["image"] === null || $article["image"] === '') {
+        $imagePath = _ASSETS_IMAGES_FOLDER_ . "default-article.jpg";
     } else {
-        $imagePath =  _ARTICLES_IMAGES_FOLDER_.$article["image"];
+        $imagePath = _ARTICLES_IMAGES_FOLDER_ . $article["image"];
     }
 ?>
 

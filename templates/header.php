@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../lib/session.php';
 $mainMenu = [
     'index.php' => 'Accueil',
     'actualites.php' => 'Actualités',

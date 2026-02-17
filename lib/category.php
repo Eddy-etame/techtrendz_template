@@ -1,9 +1,9 @@
 <?php
 
-function getCategories($pdo) {
+function getCategories(PDO $pdo): array {
     $sql = 'SELECT * FROM categories';
     $query = $pdo->prepare($sql);
     $query->execute();
     
-    return $query->fetchAll();
+    return $query->fetchAll(PDO::FETCH_ASSOC);
 }

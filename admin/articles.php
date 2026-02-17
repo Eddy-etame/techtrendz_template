@@ -7,27 +7,24 @@ require_once __DIR__ . "/../lib/pdo.php";
 require_once __DIR__ . "/../lib/article.php";
 require_once __DIR__ . "/templates/header.php";
 
-/*
-
-@todo décommenter ce code une fois toutes les fonctions codées
-
 if (isset($_GET['page'])) {
   $page = (int)$_GET['page'];
 } else {
   $page = 1;
 }
+$page = max(1, $page);
+
 $articles = getArticles($pdo, _ADMIN_ITEM_PER_PAGE_, $page);
-
 $totalArticles = getTotalArticles($pdo);
+$totalPages = max(1, (int) ceil($totalArticles / _ADMIN_ITEM_PER_PAGE_));
 
-$totalPages = ceil($totalArticles / _ADMIN_ITEM_PER_PAGE_);
-
-*/
-
+$deleteMessage = isset($_GET['delete']) ? "L'article a bien été supprimé" : null;
 ?>
 
-<!-- @todo coder la boucle foreach pour afficher les articles -->
 <h1 class="display-5 fw-bold text-body-emphasis">Articles</h1>
+<?php if ($deleteMessage) { ?>
+<div class="alert alert-success" role="alert"><?= htmlentities($deleteMessage) ?></div>
+<?php } ?>
 <div class="d-flex gap-2 justify-content-left py-5">
   <a class="btn btn-primary d-inline-flex align-items-left" href="article.php">
     Ajouter un article
@@ -42,44 +39,39 @@ $totalPages = ceil($totalArticles / _ADMIN_ITEM_PER_PAGE_);
     </tr>
   </thead>
   <tbody>
+    <?php if ($articles && count($articles) > 0) {
+        foreach ($articles as $article) { ?>
     <tr>
-      <th scope="row">52</th>
-      <td>Les meilleurs outils DevOps</td>
-      <td><a href="article.php?id=52">Modifier</a>
-        | <a href="article_delete.php?id=52" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">Supprimer</a></td>
+      <th scope="row"><?= $article['id'] ?></th>
+      <td><?= htmlentities($article['title']) ?></td>
+      <td><a href="article.php?id=<?= $article['id'] ?>">Modifier</a>
+        | <a href="article_delete.php?id=<?= $article['id'] ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">Supprimer</a></td>
     </tr>
+    <?php }
+    } else { ?>
     <tr>
-      <th scope="row">51</th>
-      <td>React Natives : Quelles différences par rapport à React</td>
-      <td><a href="article.php?id=51">Modifier</a>
-        | <a href="article_delete.php?id=51" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">Supprimer</a></td>
+      <td colspan="3">Aucun article.</td>
     </tr>
-    <tr>
-      <th scope="row">50</th>
-      <td>PHP ou Python ?</td>
-      <td><a href="article.php?id=50">Modifier</a>
-        | <a href="article_delete.php?id=50" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">Supprimer</a></td>
-    </tr>
-    <tr>
-      <th scope="row">49</th>
-      <td>Article 49</td>
-      <td><a href="article.php?id=49">Modifier</a>
-        | <a href="article_delete.php?id=49" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">Supprimer</a></td>
-    </tr>
+    <?php } ?>
   </tbody>
 </table>
 
-<!-- @todo coder la boucle foreach pour gérer les pages -->
+<?php if ($totalPages > 1) { ?>
 <nav aria-label="Page navigation example">
   <ul class="pagination">
-    <li class="page-item"><a class="page-link  active" href="?page=1">1 </a>
+    <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+      <a class="page-link" href="<?= $page <= 1 ? '#' : '?page=' . ($page - 1) ?>">Précédent</a>
     </li>
-    <li class="page-item"><a class="page-link " href="?page=2"> 2 </a>
+    <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+    <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+      <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
     </li>
-    <li class="page-item"><a class="page-link " href="?page=3">3 </a>
+    <?php } ?>
+    <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+      <a class="page-link" href="<?= $page >= $totalPages ? '#' : '?page=' . ($page + 1) ?>">Suivant</a>
     </li>
   </ul>
 </nav>
-
+<?php } ?>
 
 <?php require_once __DIR__ . "/templates/footer.php"; ?>
